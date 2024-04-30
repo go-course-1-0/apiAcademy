@@ -30,4 +30,7 @@ func main() {
 	}
 
 	log.Println("Successfully connected!")
+
+	//examples.Example1(db)
+	//examples.Example2SqlInjection(db)
 }
