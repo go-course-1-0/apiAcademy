@@ -1,6 +1,7 @@
 package main
 
 import (
+	"apiAcademy/internal/examples"
 	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"
@@ -33,4 +34,9 @@ func main() {
 
 	//examples.Example1(db)
 	//examples.Example2SqlInjection(db)
+
+	//examples.StaticQuery(db)
+	//examples.DynamicQuery(db)
+	//examples.DynamicQueryPrepared(db)
+	examples.DynamicQueryPreparedUsingStruct(db)
 }
