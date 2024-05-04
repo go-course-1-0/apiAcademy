@@ -3,11 +3,14 @@ package models
 import "time"
 
 type Student struct {
-	ID          int
-	GroupID     int
-	FullName    string
-	Phone       string
-	DateOfBirth time.Time
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID          int       `gorm:"primaryKey"`
+	GroupID     int       `gorm:"not null;"`
+	FullName    string    `gorm:"not null"`
+	Phone       string    `gorm:"not null;unique"`
+	DateOfBirth time.Time `gorm:"not null"`
+	CreatedAt   time.Time `gorm:"default:now()"`
+	UpdatedAt   time.Time `gorm:"default:now()"`
+
+	// student belongs to group
+	Group *Group
 }

@@ -3,9 +3,12 @@ package models
 import "time"
 
 type Course struct {
-	ID        int
-	Title     string
-	Duration  int
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        int       `gorm:"primaryKey"`
+	Title     string    `gorm:"not null"`
+	Duration  int       `gorm:"not null"`
+	CreatedAt time.Time `gorm:"default:now()"`
+	UpdatedAt time.Time `gorm:"default:now()"`
+
+	// course has many groups
+	Groups []Group
 }

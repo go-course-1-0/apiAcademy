@@ -3,11 +3,13 @@ package models
 import "time"
 
 type Lesson struct {
-	ID          int
-	GroupID     int
-	DayOfWeek   int
-	Time        time.Time
-	DateOfBirth time.Time
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID        int       `gorm:"primaryKey"`
+	GroupID   int       `gorm:"not null;"`
+	DayOfWeek int       `gorm:"not null"`
+	Time      time.Time `gorm:"default:null"`
+	CreatedAt time.Time `gorm:"default:now()"`
+	UpdatedAt time.Time `gorm:"default:now()"`
+
+	// lesson belongs to group
+	Group *Group
 }
