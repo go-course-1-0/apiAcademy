@@ -21,6 +21,11 @@ func GetOne(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "you try to see user %s\n", vars["id"])
 }
 
+func GetOneWithoutRestriction(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	fmt.Fprintf(w, "(without restriction) you try to see user %s\n", vars["id"])
+}
+
 func Update(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	fmt.Fprintf(w, "you try to update %s\n", vars["login"])
@@ -40,6 +45,7 @@ func main() {
 	r.HandleFunc("/users", GetList).Methods("GET")
 	r.HandleFunc("/users", Create).Methods("POST")
 	r.HandleFunc("/users/{id:[0-9]+}", GetOne).Methods("GET")
+	//r.HandleFunc("/users/{id}", GetOneWithoutRestriction).Methods("GET")
 	r.HandleFunc("/users/{login}", Update).Methods("PUT").Headers("X-Auth", "test", "anotherOne", "someText")
 	r.HandleFunc("/users/{id:[0-9]+}", Delete).Methods("DELETE")
 

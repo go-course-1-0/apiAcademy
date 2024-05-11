@@ -56,7 +56,7 @@ func (h *handler) GetAllAdmins(w http.ResponseWriter, r *http.Request, _ httprou
 	search := query.Get("name")
 
 	if search != "" {
-		h.DB.Where("name ilike ?", "%"+search+"%").Find(&users)
+		h.DB.Where("full_name ilike ?", "%"+search+"%").Find(&users)
 	} else {
 		h.DB.Find(&users)
 	}

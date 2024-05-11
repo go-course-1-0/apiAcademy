@@ -9,6 +9,8 @@ func main() {
 	r := gin.Default()
 
 	r.GET("/", func(c *gin.Context) {
+		//panic("errorrrrr!")
+
 		c.JSON(http.StatusOK, gin.H{
 			"message": "Hello!",
 		})
@@ -20,7 +22,7 @@ func main() {
 }
 
 func GetUsers(c *gin.Context) {
-	c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+	c.AbortWithStatusJSON(http.StatusAlreadyReported, gin.H{
 		"message": "I'm on vacation!",
 	})
 }
