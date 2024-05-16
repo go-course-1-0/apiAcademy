@@ -2,6 +2,7 @@ package main
 
 import (
 	"apiAcademy/internal/database/models"
+	"apiAcademy/internal/handlers"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/postgres"
@@ -36,7 +37,7 @@ func main() {
 		log.Fatal("cannot migrate tables:", err.Error())
 	}
 
-	handlers := Handlers{
+	h := handlers.Handlers{
 		DB: db,
 	}
 
@@ -44,80 +45,57 @@ func main() {
 
 	admins := router.Group("/admins")
 	{
-		admins.GET("/", handlers.GetAllAdmins)
-		admins.POST("/", handlers.CreateAdmin)
-		admins.GET("/:id", handlers.GetAllAdmins)
-		admins.PUT("/:id", handlers.GetAllAdmins)
-		admins.DELETE("/:id", handlers.GetAllAdmins)
+		admins.GET("/", h.GetAllAdmins)      // #done #withoutPagination
+		admins.POST("/", h.CreateAdmin)      // #inprogress #withoutUniqueEmailRule
+		admins.GET("/:id", h.GetOneAdmin)    // #
+		admins.PUT("/:id", h.UpdateAdmin)    // #
+		admins.DELETE("/:id", h.DeleteAdmin) // #
 	}
 
 	teachers := router.Group("/teachers")
 	{
-		teachers.GET("/", handlers.GetAllAdmins)
-		teachers.POST("/", handlers.GetAllAdmins)
-		teachers.GET("/:id", handlers.GetAllAdmins)
-		teachers.PUT("/:id", handlers.GetAllAdmins)
-		teachers.DELETE("/:id", handlers.GetAllAdmins)
+		teachers.GET("/", h.GetAllTeachers)
+		teachers.POST("/", h.CreateTeacher)
+		teachers.GET("/:id", h.GetOneTeacher)
+		teachers.PUT("/:id", h.UpdateTeacher)
+		teachers.DELETE("/:id", h.DeleteTeacher)
 	}
 
 	courses := router.Group("/courses")
 	{
-		courses.GET("/", handlers.GetAllAdmins)
-		courses.POST("/", handlers.GetAllAdmins)
-		courses.GET("/:id", handlers.GetAllAdmins)
-		courses.PUT("/:id", handlers.GetAllAdmins)
-		courses.DELETE("/:id", handlers.GetAllAdmins)
+		courses.GET("/", h.GetAllCourses)
+		courses.POST("/", h.CreateCourse)
+		courses.GET("/:id", h.GetOneCourse)
+		courses.PUT("/:id", h.UpdateCourse)
+		courses.DELETE("/:id", h.DeleteCourse)
 	}
 
 	groups := router.Group("/groups")
 	{
-		groups.GET("/", handlers.GetAllAdmins)
-		groups.POST("/", handlers.GetAllAdmins)
-		groups.GET("/:id", handlers.GetAllAdmins)
-		groups.PUT("/:id", handlers.GetAllAdmins)
-		groups.DELETE("/:id", handlers.GetAllAdmins)
+		groups.GET("/", h.GetAllGroups)
+		groups.POST("/", h.CreateGroup)
+		groups.GET("/:id", h.GetOneGroup)
+		groups.PUT("/:id", h.UpdateGroup)
+		groups.DELETE("/:id", h.DeleteGroup)
 	}
 
 	students := router.Group("/students")
 	{
-		students.GET("/", handlers.GetAllAdmins)
-		students.POST("/", handlers.GetAllAdmins)
-		students.GET("/:id", handlers.GetAllAdmins)
-		students.PUT("/:id", handlers.GetAllAdmins)
-		students.DELETE("/:id", handlers.GetAllAdmins)
+		students.GET("/", h.GetAllStudents)
+		students.POST("/", h.CreateStudent)
+		students.GET("/:id", h.GetOneStudent)
+		students.PUT("/:id", h.UpdateStudent)
+		students.DELETE("/:id", h.DeleteStudent)
 	}
 
 	lessons := router.Group("/lessons")
 	{
-		lessons.GET("/", handlers.GetAllAdmins)
-		lessons.POST("/", handlers.GetAllAdmins)
-		lessons.GET("/:id", handlers.GetAllAdmins)
-		lessons.PUT("/:id", handlers.GetAllAdmins)
-		lessons.DELETE("/:id", handlers.GetAllAdmins)
+		lessons.GET("/", h.GetAllLessons)
+		lessons.POST("/", h.CreateLesson)
+		lessons.GET("/:id", h.GetOneLesson)
+		lessons.PUT("/:id", h.UpdateLesson)
+		lessons.DELETE("/:id", h.DeleteLesson)
 	}
 
 	router.Run(":4000")
-}
-
-type Handlers struct {
-	DB *gorm.DB
-}
-
-func (h *Handlers) GetAllAdmins(c *gin.Context) {
-	var admins []models.Admin
-	h.DB.Find(&admins)
-
-	c.JSON(200, admins)
-}
-
-func (h *Handlers) CreateAdmin(c *gin.Context) {
-	var admin models.Admin
-	if err := c.ShouldBindJSON(&admin); err != nil {
-		c.JSON(422, "Validation error")
-		return
-	}
-
-	h.DB.Create(&admin)
-
-	c.JSON(201, admin)
 }
