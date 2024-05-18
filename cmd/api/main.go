@@ -3,6 +3,7 @@ package main
 import (
 	"apiAcademy/internal/database/models"
 	"apiAcademy/internal/handlers"
+	"apiAcademy/internal/helpers"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/postgres"
@@ -37,6 +38,8 @@ func main() {
 		log.Fatal("cannot migrate tables:", err.Error())
 	}
 
+	helpers.SetValidatorEngineToUseJSONTags()
+
 	h := handlers.Handlers{
 		DB: db,
 	}
@@ -46,10 +49,10 @@ func main() {
 	admins := router.Group("/admins")
 	{
 		admins.GET("/", h.GetAllAdmins)      // #done #withoutPagination
-		admins.POST("/", h.CreateAdmin)      // #inprogress #withoutUniqueEmailRule
-		admins.GET("/:id", h.GetOneAdmin)    // #
-		admins.PUT("/:id", h.UpdateAdmin)    // #
-		admins.DELETE("/:id", h.DeleteAdmin) // #
+		admins.POST("/", h.CreateAdmin)      // #done
+		admins.GET("/:id", h.GetOneAdmin)    // #done
+		admins.PUT("/:id", h.UpdateAdmin)    // #done
+		admins.DELETE("/:id", h.DeleteAdmin) // #done
 	}
 
 	teachers := router.Group("/teachers")
