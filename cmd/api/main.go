@@ -57,29 +57,29 @@ func main() {
 
 	teachers := router.Group("/teachers")
 	{
-		teachers.GET("/", h.GetAllTeachers)
-		teachers.POST("/", h.CreateTeacher)
-		teachers.GET("/:id", h.GetOneTeacher)
-		teachers.PUT("/:id", h.UpdateTeacher)
-		teachers.DELETE("/:id", h.DeleteTeacher)
+		teachers.GET("/", h.GetAllTeachers)      // #done #withoutPagination
+		teachers.POST("/", h.CreateTeacher)      // #done
+		teachers.GET("/:id", h.GetOneTeacher)    // #done
+		teachers.PUT("/:id", h.UpdateTeacher)    // #done
+		teachers.DELETE("/:id", h.DeleteTeacher) // #done
 	}
 
 	courses := router.Group("/courses")
 	{
-		courses.GET("/", h.GetAllCourses)
-		courses.POST("/", h.CreateCourse)
-		courses.GET("/:id", h.GetOneCourse)
-		courses.PUT("/:id", h.UpdateCourse)
-		courses.DELETE("/:id", h.DeleteCourse)
+		courses.GET("/", h.GetAllCourses)      // #done #withoutPagination
+		courses.POST("/", h.CreateCourse)      // #done
+		courses.GET("/:id", h.GetOneCourse)    // #done
+		courses.PUT("/:id", h.UpdateCourse)    // #done
+		courses.DELETE("/:id", h.DeleteCourse) // #done
 	}
 
 	groups := router.Group("/groups")
 	{
-		groups.GET("/", h.GetAllGroups)
-		groups.POST("/", h.CreateGroup)
-		groups.GET("/:id", h.GetOneGroup)
-		groups.PUT("/:id", h.UpdateGroup)
-		groups.DELETE("/:id", h.DeleteGroup)
+		groups.GET("/", h.GetAllGroups)      // #done #withoutPagination
+		groups.POST("/", h.CreateGroup)      // #done #withoutForeignKeysValidation #withoutDateValidation
+		groups.GET("/:id", h.GetOneGroup)    // #done
+		groups.PUT("/:id", h.UpdateGroup)    // #done #withoutForeignKeysValidation #withoutDateValidation
+		groups.DELETE("/:id", h.DeleteGroup) // #done
 	}
 
 	students := router.Group("/students")

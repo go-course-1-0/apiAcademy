@@ -14,9 +14,7 @@ func (h *Handlers) GetAllAdmins(c *gin.Context) {
 	var admins []models.Admin
 	if err := h.DB.Find(&admins).Error; err != nil {
 		log.Println("cannot get admins:", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Internal server error",
-		})
+		helpers.InternalServerError(c)
 		return
 	}
 
@@ -63,9 +61,7 @@ func (h *Handlers) CreateAdmin(c *gin.Context) {
 
 	if err := h.DB.Create(&admin).Error; err != nil {
 		log.Println("cannot create admin:", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Internal server error",
-		})
+		helpers.InternalServerError(c)
 		return
 	}
 
@@ -79,14 +75,10 @@ func (h *Handlers) GetOneAdmin(c *gin.Context) {
 	if err := h.DB.Where("id = ?", c.Param("id")).
 		First(&admin).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{
-				"message": "Record Not Found",
-			})
+			helpers.NotFound(c)
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Internal Server Error",
-		})
+		helpers.InternalServerError(c)
 		return
 	}
 
@@ -100,14 +92,10 @@ func (h *Handlers) UpdateAdmin(c *gin.Context) {
 	if err := h.DB.Where("id = ?", c.Param("id")).
 		First(&admin).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{
-				"message": "Record Not Found",
-			})
+			helpers.NotFound(c)
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Internal Server Error",
-		})
+		helpers.InternalServerError(c)
 		return
 	}
 
@@ -141,9 +129,7 @@ func (h *Handlers) UpdateAdmin(c *gin.Context) {
 
 	if err := h.DB.Save(&admin).Error; err != nil {
 		log.Println("cannot update admin:", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Internal server error",
-		})
+		helpers.InternalServerError(c)
 		return
 	}
 
@@ -157,26 +143,20 @@ func (h *Handlers) DeleteAdmin(c *gin.Context) {
 	if err := h.DB.Where("id = ?", c.Param("id")).
 		First(&admin).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{
-				"message": "Record Not Found",
-			})
+			helpers.NotFound(c)
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Internal Server Error",
-		})
+		helpers.InternalServerError(c)
 		return
 	}
 
 	// delete from admins where id = admin.ID
 	if err := h.DB.Delete(&admin).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Internal Server Error",
-		})
+		helpers.InternalServerError(c)
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Администратор удален",
+		"message": "Успешно удалено",
 	})
 }

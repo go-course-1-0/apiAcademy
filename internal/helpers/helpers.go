@@ -41,6 +41,10 @@ func ValidationMessageForTag(tag string, param any) string {
 		return "Длина данного поля не должна быть меньше " + param.(string) + " символов"
 	case "max":
 		return "Длина данного поля не должна быть больше " + param.(string) + " символов"
+	case "gte":
+		return "Значение этого поля должна быть больше или равно " + param.(string)
+	case "lte":
+		return "Значение этого поля должна быть меньше или равно " + param.(string)
 	case "unique":
 		return "Такое значение уже существует в БД"
 	default:
