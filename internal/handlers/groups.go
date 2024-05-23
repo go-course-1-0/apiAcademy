@@ -5,6 +5,7 @@ import (
 	"apiAcademy/internal/helpers"
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/paraparadox/datetime"
 	"gorm.io/gorm"
 	"log"
 	"net/http"
@@ -28,11 +29,11 @@ func (h *Handlers) GetAllGroups(c *gin.Context) {
 
 // UUID or GUID
 type groupRequest struct {
-	CourseID  int       `json:"courseID" binding:"required,gte=1"`
-	TeacherID int       `json:"teacherID" binding:"required,gte=1"`
-	Title     string    `json:"title" binding:"required,max=64"`
-	Start     time.Time `json:"start" binding:"omitempty,datetime=2006-01-02"`
-	Finish    time.Time `json:"finish" binding:"omitempty,datetime=2006-01-02"`
+	CourseID  int    `json:"courseID" binding:"required,gte=1"`
+	TeacherID int    `json:"teacherID" binding:"required,gte=1"`
+	Title     string `json:"title" binding:"required,max=64"`
+	Start     string `json:"start" binding:"omitempty"`
+	Finish    string `json:"finish" binding:"omitempty"`
 }
 
 func (h *Handlers) CreateGroup(c *gin.Context) {
@@ -43,17 +44,45 @@ func (h *Handlers) CreateGroup(c *gin.Context) {
 		helpers.FillValidationErrorTag(err, validationErrors)
 	}
 
+	start, err := time.Parse(datetime.DateLayout, requestBody.Start)
+	if err != nil {
+		if _, exists := validationErrors["start"]; !exists {
+			validationErrors["start"] = helpers.ValidationMessageForTag("date-format", "")
+		}
+	}
+
+	finish, err := time.Parse(datetime.DateLayout, requestBody.Finish)
+	if err != nil {
+		if _, exists := validationErrors["finish"]; !exists {
+			validationErrors["finish"] = helpers.ValidationMessageForTag("date-format", "")
+		}
+	}
+
+	var course models.Course
+	if err := h.DB.Where("id = ?", requestBody.CourseID).First(&course).Error; err != nil {
+		if _, exists := validationErrors["courseID"]; !exists {
+			validationErrors["courseID"] = helpers.ValidationMessageForTag("exists", "")
+		}
+	}
+
+	var teacher models.Teacher
+	if err := h.DB.Where("id = ?", requestBody.TeacherID).First(&teacher).Error; err != nil {
+		if _, exists := validationErrors["teacherID"]; !exists {
+			validationErrors["teacherID"] = helpers.ValidationMessageForTag("exists", "")
+		}
+	}
+
 	if len(validationErrors) != 0 {
 		c.JSON(http.StatusUnprocessableEntity, validationErrors)
 		return
 	}
 
 	group := models.Group{
-		CourseID:  requestBody.CourseID,
-		TeacherID: requestBody.TeacherID,
+		CourseID:  course.ID,
+		TeacherID: teacher.ID,
 		Title:     requestBody.Title,
-		Start:     requestBody.Start,
-		Finish:    requestBody.Finish,
+		Start:     datetime.Date(start),
+		Finish:    datetime.Date(finish),
 	}
 
 	if err := h.DB.Create(&group).Error; err != nil {
@@ -107,16 +136,44 @@ func (h *Handlers) UpdateGroup(c *gin.Context) {
 		helpers.FillValidationErrorTag(err, validationErrors)
 	}
 
+	start, err := time.Parse(datetime.DateLayout, requestBody.Start)
+	if err != nil {
+		if _, exists := validationErrors["start"]; !exists {
+			validationErrors["start"] = helpers.ValidationMessageForTag("date-format", "")
+		}
+	}
+
+	finish, err := time.Parse(datetime.DateLayout, requestBody.Finish)
+	if err != nil {
+		if _, exists := validationErrors["finish"]; !exists {
+			validationErrors["finish"] = helpers.ValidationMessageForTag("date-format", "")
+		}
+	}
+
+	var course models.Course
+	if err := h.DB.Where("id = ?", requestBody.CourseID).First(&course).Error; err != nil {
+		if _, exists := validationErrors["courseID"]; !exists {
+			validationErrors["courseID"] = helpers.ValidationMessageForTag("exists", "")
+		}
+	}
+
+	var teacher models.Teacher
+	if err := h.DB.Where("id = ?", requestBody.TeacherID).First(&teacher).Error; err != nil {
+		if _, exists := validationErrors["teacherID"]; !exists {
+			validationErrors["teacherID"] = helpers.ValidationMessageForTag("exists", "")
+		}
+	}
+
 	if len(validationErrors) != 0 {
 		c.JSON(http.StatusUnprocessableEntity, validationErrors)
 		return
 	}
 
-	group.CourseID = requestBody.CourseID
-	group.TeacherID = requestBody.TeacherID
+	group.CourseID = course.ID
+	group.TeacherID = teacher.ID
 	group.Title = requestBody.Title
-	group.Start = requestBody.Start
-	group.Finish = requestBody.Finish
+	group.Start = datetime.Date(start)
+	group.Finish = datetime.Date(finish)
 
 	if err := h.DB.Save(&group).Error; err != nil {
 		log.Println("cannot update group:", err.Error())

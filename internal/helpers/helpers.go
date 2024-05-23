@@ -41,12 +41,24 @@ func ValidationMessageForTag(tag string, param any) string {
 		return "Длина данного поля не должна быть меньше " + param.(string) + " символов"
 	case "max":
 		return "Длина данного поля не должна быть больше " + param.(string) + " символов"
+	case "len":
+		return "Длина данного поля должна быть ровно " + param.(string) + " символов"
 	case "gte":
 		return "Значение этого поля должна быть больше или равно " + param.(string)
 	case "lte":
 		return "Значение этого поля должна быть меньше или равно " + param.(string)
 	case "unique":
 		return "Такое значение уже существует в БД"
+	case "exists":
+		return "Указанный ресурс не существует"
+	case "date-format":
+		return "Неправильный формат даты. Введите в формате гггг-мм-дд"
+	case "time-format":
+		return "Неправильный формат времени. Введите в формате чч:мм"
+	case "numeric":
+		return "Данное поле принимает только цифровое значение"
+	case "oneof":
+		return "Данное поле принимает значение из набора " + param.(string)
 	default:
 		return ""
 	}

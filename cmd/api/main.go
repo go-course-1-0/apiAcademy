@@ -20,6 +20,7 @@ const (
 )
 
 func main() {
+	// #refactor
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable TimeZone=Asia/Dushanbe", DBHost, DBPort, DBUser, DBPassword, DBName)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -45,6 +46,9 @@ func main() {
 	}
 
 	router := gin.Default()
+
+	// #authorization
+	// #middleware
 
 	admins := router.Group("/admins")
 	{
@@ -76,28 +80,28 @@ func main() {
 	groups := router.Group("/groups")
 	{
 		groups.GET("/", h.GetAllGroups)      // #done #withoutPagination
-		groups.POST("/", h.CreateGroup)      // #done #withoutForeignKeysValidation #withoutDateValidation
+		groups.POST("/", h.CreateGroup)      // #done
 		groups.GET("/:id", h.GetOneGroup)    // #done
-		groups.PUT("/:id", h.UpdateGroup)    // #done #withoutForeignKeysValidation #withoutDateValidation
+		groups.PUT("/:id", h.UpdateGroup)    // #done
 		groups.DELETE("/:id", h.DeleteGroup) // #done
 	}
 
 	students := router.Group("/students")
 	{
-		students.GET("/", h.GetAllStudents)
-		students.POST("/", h.CreateStudent)
-		students.GET("/:id", h.GetOneStudent)
-		students.PUT("/:id", h.UpdateStudent)
-		students.DELETE("/:id", h.DeleteStudent)
+		students.GET("/", h.GetAllStudents)      // #done #withoutPagination
+		students.POST("/", h.CreateStudent)      // #done #validateAge
+		students.GET("/:id", h.GetOneStudent)    // #done
+		students.PUT("/:id", h.UpdateStudent)    // #done #validateAge
+		students.DELETE("/:id", h.DeleteStudent) // #done
 	}
 
 	lessons := router.Group("/lessons")
 	{
-		lessons.GET("/", h.GetAllLessons)
-		lessons.POST("/", h.CreateLesson)
-		lessons.GET("/:id", h.GetOneLesson)
-		lessons.PUT("/:id", h.UpdateLesson)
-		lessons.DELETE("/:id", h.DeleteLesson)
+		lessons.GET("/", h.GetAllLessons)      // #done
+		lessons.POST("/", h.CreateLesson)      // #done #timezone
+		lessons.GET("/:id", h.GetOneLesson)    // #done
+		lessons.PUT("/:id", h.UpdateLesson)    // #done #timezone
+		lessons.DELETE("/:id", h.DeleteLesson) // #done
 	}
 
 	router.Run(":4000")

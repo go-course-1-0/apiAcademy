@@ -1,15 +1,18 @@
 package models
 
-import "time"
+import (
+	"github.com/paraparadox/datetime"
+	"time"
+)
 
 type Lesson struct {
-	ID        int       `gorm:"primaryKey"`
-	GroupID   int       `gorm:"not null;"`
-	DayOfWeek int       `gorm:"not null"`
-	Time      time.Time `gorm:"default:null"`
-	CreatedAt time.Time `gorm:"default:now()"`
-	UpdatedAt time.Time `gorm:"default:now()"`
+	ID        int           `json:"id" gorm:"primaryKey"`
+	GroupID   int           `json:"groupID" gorm:"not null;"`
+	DayOfWeek time.Weekday  `json:"dayOfWeek" gorm:"not null"`
+	Time      datetime.Time `json:"time" gorm:"default:null"`
+	CreatedAt time.Time     `json:"createdAt" gorm:"default:now()"`
+	UpdatedAt time.Time     `json:"updatedAt" gorm:"default:now()"`
 
 	// lesson belongs to group
-	Group *Group
+	Group *Group `json:"group,omitempty"`
 }
