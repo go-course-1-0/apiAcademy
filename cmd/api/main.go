@@ -50,6 +50,8 @@ func main() {
 	// #authorization
 	// #middleware
 
+	router.Static("/storage", "./storage")
+
 	admins := router.Group("/admins")
 	{
 		admins.GET("/", h.GetAllAdmins)      // #done #withoutPagination
@@ -88,11 +90,13 @@ func main() {
 
 	students := router.Group("/students")
 	{
-		students.GET("/", h.GetAllStudents)      // #done #withoutPagination
-		students.POST("/", h.CreateStudent)      // #done #validateAge
-		students.GET("/:id", h.GetOneStudent)    // #done
-		students.PUT("/:id", h.UpdateStudent)    // #done #validateAge
-		students.DELETE("/:id", h.DeleteStudent) // #done
+		students.GET("/", h.GetAllStudents)            // #done #withoutPagination
+		students.POST("/", h.CreateStudent)            // #done #validateAge
+		students.GET("/:id", h.GetOneStudent)          // #done
+		students.PUT("/:id", h.UpdateStudent)          // #done #validateAge
+		students.DELETE("/:id", h.DeleteStudent)       // #done
+		students.POST("/:id/avatar", h.UploadAvatar)   // #done
+		students.DELETE("/:id/avatar", h.RemoveAvatar) // #done
 	}
 
 	lessons := router.Group("/lessons")

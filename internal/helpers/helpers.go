@@ -4,7 +4,9 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
+	"os"
 	"reflect"
+	"strconv"
 	"strings"
 )
 
@@ -59,7 +61,22 @@ func ValidationMessageForTag(tag string, param any) string {
 		return "Данное поле принимает только цифровое значение"
 	case "oneof":
 		return "Данное поле принимает значение из набора " + param.(string)
+	case "max-number-of-elements":
+		return "Данно поле принимает максимум " + strconv.Itoa(param.(int)) + " элемент(ов)"
 	default:
 		return ""
 	}
+}
+
+//func SaveImage(path string, image *multipart.FileHeader, c *gin.Context) (string, error) {
+//	newFileName := path + uuid.New().String() + filepath.Ext(image.Filename)
+//	if err := c.SaveUploadedFile(image, newFileName); err != nil {
+//		return "", err
+//	}
+//	return newFileName, nil
+//}
+
+func DeleteImage(url string) error {
+	pathSlice := strings.TrimPrefix(url, "http://localhost:4000/")
+	return os.RemoveAll(pathSlice)
 }

@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"net/http"
+	"path/filepath"
 	"time"
 )
 
@@ -169,5 +170,95 @@ func (h *Handlers) DeleteStudent(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Успешно удалено",
+	})
+}
+
+func (h *Handlers) UploadAvatar(c *gin.Context) {
+	validationErrors := make(map[string]string)
+
+	// find the entity by ID specified in URI params
+	var student models.Student
+	if err := h.DB.Where("id = ?", c.Param("id")).
+		First(&student).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			helpers.NotFound(c)
+			return
+		}
+		helpers.InternalServerError(c)
+		return
+	}
+
+	// Validate and bind the form data
+	form, err := c.MultipartForm()
+	if err != nil {
+		helpers.BadRequest(c)
+		return
+	}
+
+	// Get the uploaded files
+	files := form.File["file"]
+	if len(files) == 0 {
+		validationErrors["file"] = helpers.ValidationMessageForTag("required", "")
+	} else if len(files) > 1 {
+		validationErrors["file"] = helpers.ValidationMessageForTag("max-number-of-elements", 1)
+	}
+
+	if len(validationErrors) != 0 {
+		c.JSON(http.StatusUnprocessableEntity, validationErrors)
+		return
+	}
+
+	fileName := "storage/student-avatars/" + student.Phone + "Avatar" + filepath.Ext(files[0].Filename)
+
+	if err := c.SaveUploadedFile(files[0], "./"+fileName); err != nil {
+		log.Println("cannot save image into filesystem:", err)
+		helpers.InternalServerError(c)
+		return
+	}
+
+	student.Avatar = "http://localhost:4000/" + fileName
+
+	// Save the image record to the database
+	if err := h.DB.Save(&student).Error; err != nil {
+		log.Println("cannot save student:", err)
+		helpers.InternalServerError(c)
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"student": student,
+	})
+}
+
+func (h *Handlers) RemoveAvatar(c *gin.Context) {
+	// find the entity by ID specified in URI params
+	var student models.Student
+	if err := h.DB.Where("id = ?", c.Param("id")).
+		First(&student).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			helpers.NotFound(c)
+			return
+		}
+		helpers.InternalServerError(c)
+		return
+	}
+
+	if err := helpers.DeleteImage(student.Avatar); err != nil {
+		log.Println("cannot remove student's avatar:", err.Error())
+		helpers.InternalServerError(c)
+		return
+	}
+
+	student.Avatar = ""
+
+	// Save the image record to the database
+	if err := h.DB.Save(&student).Error; err != nil {
+		log.Println("cannot save student:", err)
+		helpers.InternalServerError(c)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"student": student,
 	})
 }

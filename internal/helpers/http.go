@@ -16,3 +16,9 @@ func NotFound(c *gin.Context) {
 		"message": "Ресурс не найден",
 	})
 }
+
+func BadRequest(c *gin.Context) {
+	c.JSON(http.StatusBadRequest, gin.H{
+		"message": "Неправильный запрос",
+	})
+}
