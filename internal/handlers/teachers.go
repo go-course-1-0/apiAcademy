@@ -6,7 +6,6 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"log"
 	"net/http"
 )
 
@@ -14,7 +13,7 @@ func (h *Handlers) GetAllTeachers(c *gin.Context) {
 	var teachers []models.Teacher
 	if err := h.DB.Preload("Groups.Course").
 		Find(&teachers).Error; err != nil {
-		log.Println("cannot get teachers:", err.Error())
+		h.Logger.Error("cannot get teachers", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -48,7 +47,7 @@ func (h *Handlers) CreateTeacher(c *gin.Context) {
 	}
 
 	if err := h.DB.Create(&teacher).Error; err != nil {
-		log.Println("cannot create teacher:", err.Error())
+		h.Logger.Error("cannot create teacher", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -67,6 +66,7 @@ func (h *Handlers) GetOneTeacher(c *gin.Context) {
 			helpers.NotFound(c)
 			return
 		}
+		h.Logger.Error("cannot get teacher", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -84,6 +84,7 @@ func (h *Handlers) UpdateTeacher(c *gin.Context) {
 			helpers.NotFound(c)
 			return
 		}
+		h.Logger.Error("cannot get teacher", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -104,7 +105,7 @@ func (h *Handlers) UpdateTeacher(c *gin.Context) {
 	teacher.Subject = requestBody.Subject
 
 	if err := h.DB.Save(&teacher).Error; err != nil {
-		log.Println("cannot update teacher:", err.Error())
+		h.Logger.Error("cannot update teacher", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -122,11 +123,13 @@ func (h *Handlers) DeleteTeacher(c *gin.Context) {
 			helpers.NotFound(c)
 			return
 		}
+		h.Logger.Error("cannot get teacher", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
 
 	if err := h.DB.Delete(&teacher).Error; err != nil {
+		h.Logger.Error("cannot delete teacher", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}

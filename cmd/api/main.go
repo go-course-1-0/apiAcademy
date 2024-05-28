@@ -1,49 +1,31 @@
 package main
 
 import (
-	"apiAcademy/internal/database/models"
+	"apiAcademy/internal/database"
 	"apiAcademy/internal/handlers"
 	"apiAcademy/internal/helpers"
-	"fmt"
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-	"log"
-)
-
-const (
-	DBHost     = "localhost" // 127.0.0.1
-	DBPort     = 5432
-	DBUser     = "postgres"
-	DBPassword = "postgres"
-	DBName     = "academy_db"
+	"log/slog"
+	"os"
 )
 
 func main() {
-	// #refactor
-	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable TimeZone=Asia/Dushanbe", DBHost, DBPort, DBUser, DBPassword, DBName)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println("successfully connected to the DB")
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
-	if err = db.AutoMigrate(
-		&models.Admin{},
-		&models.Teacher{},
-		&models.Course{},
-		&models.Group{},
-		&models.Student{},
-		&models.Lesson{},
-	); err != nil {
-		log.Fatal("cannot migrate tables:", err.Error())
+	db, err := database.GormConnect()
+	if err != nil {
+		logger.Error("cannot connect to DB via gorm", "err", err.Error())
+		return
 	}
+
+	if err := database.GormAutoMigrate(db); err != nil {
+		logger.Error("cannot automigrate models", "err", err.Error())
+		return
+	}
+
+	h := handlers.NewHandlers(db, logger)
 
 	helpers.SetValidatorEngineToUseJSONTags()
-
-	h := handlers.Handlers{
-		DB: db,
-	}
 
 	router := gin.Default()
 

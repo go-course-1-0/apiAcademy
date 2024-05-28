@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/paraparadox/datetime"
 	"gorm.io/gorm"
-	"log"
 	"net/http"
 	"time"
 )
@@ -16,7 +15,7 @@ func (h *Handlers) GetAllLessons(c *gin.Context) {
 	var lessons []models.Lesson
 	if err := h.DB.Preload("Group.Teacher").
 		Find(&lessons).Error; err != nil {
-		log.Println("cannot get lessons:", err.Error())
+		h.Logger.Error("cannot get lessons", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -66,7 +65,7 @@ func (h *Handlers) CreateLesson(c *gin.Context) {
 	}
 
 	if err := h.DB.Create(&lesson).Error; err != nil {
-		log.Println("cannot create lesson:", err.Error())
+		h.Logger.Error("cannot create lesson", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -85,6 +84,7 @@ func (h *Handlers) GetOneLesson(c *gin.Context) {
 			helpers.NotFound(c)
 			return
 		}
+		h.Logger.Error("cannot get lesson", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -102,6 +102,7 @@ func (h *Handlers) UpdateLesson(c *gin.Context) {
 			helpers.NotFound(c)
 			return
 		}
+		h.Logger.Error("cannot get lesson", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -137,7 +138,7 @@ func (h *Handlers) UpdateLesson(c *gin.Context) {
 	lesson.Time = datetime.Time(lessonTime)
 
 	if err := h.DB.Save(&lesson).Error; err != nil {
-		log.Println("cannot update lesson:", err.Error())
+		h.Logger.Error("cannot update lesson", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -155,11 +156,13 @@ func (h *Handlers) DeleteLesson(c *gin.Context) {
 			helpers.NotFound(c)
 			return
 		}
+		h.Logger.Error("cannot get lesson", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
 
 	if err := h.DB.Delete(&lesson).Error; err != nil {
+		h.Logger.Error("cannot delete lesson", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}

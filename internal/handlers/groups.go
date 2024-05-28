@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/paraparadox/datetime"
 	"gorm.io/gorm"
-	"log"
 	"net/http"
 	"time"
 )
@@ -17,7 +16,7 @@ func (h *Handlers) GetAllGroups(c *gin.Context) {
 	if err := h.DB.Preload("Course").
 		Preload("Teacher").
 		Find(&groups).Error; err != nil {
-		log.Println("cannot get groups:", err.Error())
+		h.Logger.Error("cannot get groups", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -86,7 +85,7 @@ func (h *Handlers) CreateGroup(c *gin.Context) {
 	}
 
 	if err := h.DB.Create(&group).Error; err != nil {
-		log.Println("cannot create group:", err.Error())
+		h.Logger.Error("cannot create group", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -108,6 +107,7 @@ func (h *Handlers) GetOneGroup(c *gin.Context) {
 			helpers.NotFound(c)
 			return
 		}
+		h.Logger.Error("cannot get group", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -125,6 +125,7 @@ func (h *Handlers) UpdateGroup(c *gin.Context) {
 			helpers.NotFound(c)
 			return
 		}
+		h.Logger.Error("cannot get group", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -176,7 +177,7 @@ func (h *Handlers) UpdateGroup(c *gin.Context) {
 	group.Finish = datetime.Date(finish)
 
 	if err := h.DB.Save(&group).Error; err != nil {
-		log.Println("cannot update group:", err.Error())
+		h.Logger.Error("cannot update group", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -194,11 +195,13 @@ func (h *Handlers) DeleteGroup(c *gin.Context) {
 			helpers.NotFound(c)
 			return
 		}
+		h.Logger.Error("cannot get group", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
 
 	if err := h.DB.Delete(&group).Error; err != nil {
+		h.Logger.Error("cannot delete group", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}

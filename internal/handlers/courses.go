@@ -6,7 +6,6 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"log"
 	"net/http"
 )
 
@@ -14,7 +13,7 @@ func (h *Handlers) GetAllCourses(c *gin.Context) {
 	var courses []models.Course
 	if err := h.DB.Preload("Groups.Teacher").
 		Find(&courses).Error; err != nil {
-		log.Println("cannot get courses:", err.Error())
+		h.Logger.Error("cannot get courses", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -48,7 +47,7 @@ func (h *Handlers) CreateCourse(c *gin.Context) {
 	}
 
 	if err := h.DB.Create(&course).Error; err != nil {
-		log.Println("cannot create course:", err.Error())
+		h.Logger.Error("cannot create course", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -67,6 +66,7 @@ func (h *Handlers) GetOneCourse(c *gin.Context) {
 			helpers.NotFound(c)
 			return
 		}
+		h.Logger.Error("cannot get course", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -84,6 +84,7 @@ func (h *Handlers) UpdateCourse(c *gin.Context) {
 			helpers.NotFound(c)
 			return
 		}
+		h.Logger.Error("cannot get course", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -104,7 +105,7 @@ func (h *Handlers) UpdateCourse(c *gin.Context) {
 	course.Duration = requestBody.Duration
 
 	if err := h.DB.Save(&course).Error; err != nil {
-		log.Println("cannot update course:", err.Error())
+		h.Logger.Error("cannot update course", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -122,11 +123,13 @@ func (h *Handlers) DeleteCourse(c *gin.Context) {
 			helpers.NotFound(c)
 			return
 		}
+		h.Logger.Error("cannot get course", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
 
 	if err := h.DB.Delete(&course).Error; err != nil {
+		h.Logger.Error("cannot delete course", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}

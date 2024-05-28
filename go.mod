@@ -4,6 +4,7 @@ go 1.22.1
 
 require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
+	github.com/brianvoe/gofakeit/v7 v7.0.3 // indirect
 	github.com/buaazp/fasthttprouter v0.1.1 // indirect
 	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect

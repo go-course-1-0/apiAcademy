@@ -6,14 +6,13 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"log"
 	"net/http"
 )
 
 func (h *Handlers) GetAllAdmins(c *gin.Context) {
 	var admins []models.Admin
 	if err := h.DB.Find(&admins).Error; err != nil {
-		log.Println("cannot get admins:", err.Error())
+		h.Logger.Error("cannot get admins", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -60,7 +59,7 @@ func (h *Handlers) CreateAdmin(c *gin.Context) {
 	}
 
 	if err := h.DB.Create(&admin).Error; err != nil {
-		log.Println("cannot create admin:", err.Error())
+		h.Logger.Error("cannot create admin", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -78,6 +77,7 @@ func (h *Handlers) GetOneAdmin(c *gin.Context) {
 			helpers.NotFound(c)
 			return
 		}
+		h.Logger.Error("cannot get admin", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -95,6 +95,7 @@ func (h *Handlers) UpdateAdmin(c *gin.Context) {
 			helpers.NotFound(c)
 			return
 		}
+		h.Logger.Error("cannot get admin", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -128,7 +129,7 @@ func (h *Handlers) UpdateAdmin(c *gin.Context) {
 	admin.Password = requestBody.Password
 
 	if err := h.DB.Save(&admin).Error; err != nil {
-		log.Println("cannot update admin:", err.Error())
+		h.Logger.Error("cannot update admin", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -146,12 +147,14 @@ func (h *Handlers) DeleteAdmin(c *gin.Context) {
 			helpers.NotFound(c)
 			return
 		}
+		h.Logger.Error("cannot get admin", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
 
 	// delete from admins where id = admin.ID
 	if err := h.DB.Delete(&admin).Error; err != nil {
+		h.Logger.Error("cannot delete admin", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}

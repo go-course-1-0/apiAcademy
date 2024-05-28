@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/paraparadox/datetime"
 	"gorm.io/gorm"
-	"log"
 	"net/http"
 	"path/filepath"
 	"time"
@@ -17,7 +16,7 @@ func (h *Handlers) GetAllStudents(c *gin.Context) {
 	var students []models.Student
 	if err := h.DB.Preload("Group").
 		Find(&students).Error; err != nil {
-		log.Println("cannot get students:", err.Error())
+		h.Logger.Error("cannot get students", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -69,7 +68,7 @@ func (h *Handlers) CreateStudent(c *gin.Context) {
 	}
 
 	if err := h.DB.Create(&student).Error; err != nil {
-		log.Println("cannot create student:", err.Error())
+		h.Logger.Error("cannot create student", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -88,6 +87,7 @@ func (h *Handlers) GetOneStudent(c *gin.Context) {
 			helpers.NotFound(c)
 			return
 		}
+		h.Logger.Error("cannot get student", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -105,6 +105,7 @@ func (h *Handlers) UpdateStudent(c *gin.Context) {
 			helpers.NotFound(c)
 			return
 		}
+		h.Logger.Error("cannot get student", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -141,7 +142,7 @@ func (h *Handlers) UpdateStudent(c *gin.Context) {
 	student.DateOfBirth = datetime.Date(dateOfBirth)
 
 	if err := h.DB.Save(&student).Error; err != nil {
-		log.Println("cannot update student:", err.Error())
+		h.Logger.Error("cannot update student", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -159,11 +160,13 @@ func (h *Handlers) DeleteStudent(c *gin.Context) {
 			helpers.NotFound(c)
 			return
 		}
+		h.Logger.Error("cannot get student", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
 
 	if err := h.DB.Delete(&student).Error; err != nil {
+		h.Logger.Error("cannot delete student", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -184,6 +187,7 @@ func (h *Handlers) UploadAvatar(c *gin.Context) {
 			helpers.NotFound(c)
 			return
 		}
+		h.Logger.Error("cannot get student", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -211,7 +215,7 @@ func (h *Handlers) UploadAvatar(c *gin.Context) {
 	fileName := "storage/student-avatars/" + student.Phone + "Avatar" + filepath.Ext(files[0].Filename)
 
 	if err := c.SaveUploadedFile(files[0], "./"+fileName); err != nil {
-		log.Println("cannot save image into filesystem:", err)
+		h.Logger.Error("cannot save image into filesystem", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -220,7 +224,7 @@ func (h *Handlers) UploadAvatar(c *gin.Context) {
 
 	// Save the image record to the database
 	if err := h.DB.Save(&student).Error; err != nil {
-		log.Println("cannot save student:", err)
+		h.Logger.Error("cannot save student", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -239,12 +243,13 @@ func (h *Handlers) RemoveAvatar(c *gin.Context) {
 			helpers.NotFound(c)
 			return
 		}
+		h.Logger.Error("cannot get student", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
 
 	if err := helpers.DeleteImage(student.Avatar); err != nil {
-		log.Println("cannot remove student's avatar:", err.Error())
+		h.Logger.Error("cannot remove student's avatar", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
@@ -253,7 +258,7 @@ func (h *Handlers) RemoveAvatar(c *gin.Context) {
 
 	// Save the image record to the database
 	if err := h.DB.Save(&student).Error; err != nil {
-		log.Println("cannot save student:", err)
+		h.Logger.Error("cannot save student", "err", err.Error())
 		helpers.InternalServerError(c)
 		return
 	}
