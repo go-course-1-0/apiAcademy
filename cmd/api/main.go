@@ -4,6 +4,7 @@ import (
 	"apiAcademy/internal/database"
 	"apiAcademy/internal/handlers"
 	"apiAcademy/internal/helpers"
+	"apiAcademy/internal/middlewares"
 	"github.com/gin-gonic/gin"
 	"log/slog"
 	"os"
@@ -29,10 +30,29 @@ func main() {
 
 	router := gin.Default()
 
-	// #authorization
+	// #authentication - Who is it?
+	// #authorization - What can he do? / Can he do X? ("teacher" != "admin")
 	// #middleware
 
 	router.Static("/storage", "./storage")
+
+	//router.Use(middlewares.APIKeyAuth([]string{"crm-api", "budget-api", "notification-api"}))
+
+	// sign-in / login -> user sends his login and password
+	// authentication (&& authorization)
+	// if unsuccessful -> abort
+	// if successful:
+	// 		generate a key (jwt token)
+	// 		save the key
+	//		send the key (jwt token) to client
+
+	// sign-out / logout -> user requests the server to revoke the key (jwt token)
+	// authentication (&& authorization)
+	// remove the key
+
+	router.POST("/auth/login", h.Login) // #done #withoutTokenSaving #plainTextPassword
+	router.Use(middlewares.JWTAuth(h.DB, h.Logger))
+	router.POST("/auth/logout", h.Logout) //
 
 	admins := router.Group("/admins")
 	{
